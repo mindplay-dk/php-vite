@@ -1,0 +1,14 @@
+{
+    "name": "mindplay/php-vite",
+    "scripts": {
+        "test": "php test/test.php"
+    },
+    "autoload": {
+        "psr-4": {
+            "mindplay\\vite\\": "src/"
+        }
+    },
+    "require-dev": {
+        "mindplay/testies": "^1.1"
+    }
+}
