@@ -1,6 +1,7 @@
 # PHP-Vite
 
 [![PHP Version](https://img.shields.io/badge/php-8.1%2B-blue.svg)](https://packagist.org/packages/mindplay/php-vite)
+[![Build Status](https://github.com/mindplay-dk/php-vite/actions/workflows/ci.yml/badge.svg)](https://github.com/mindplay-dk/php-vite/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MS--RL-green)](https://opensource.org/license/ms-rl-html)
 
 This library provides a lightweight [backend integration](https://vitejs.dev/guide/backend-integration.html)

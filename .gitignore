@@ -1,3 +1,2 @@
-.git*
-!.gitignore
 /vendor
+/test/coverage.xml
