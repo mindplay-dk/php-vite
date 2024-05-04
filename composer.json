@@ -1,5 +1,8 @@
 {
     "name": "mindplay/php-vite",
+    "type": "library",
+    "license": "MS-RL",
+    "description": "a lightweight PHP-backend integration for the Vite frontend build tool",
     "scripts": {
         "test": "php test/test.php"
     },
@@ -7,6 +10,9 @@
         "psr-4": {
             "mindplay\\vite\\": "src/"
         }
+    },
+    "require": {
+        "php": ">=8.1"
     },
     "require-dev": {
         "mindplay/testies": "^1.1"
