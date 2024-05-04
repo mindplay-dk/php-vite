@@ -2,9 +2,11 @@
 
 use mindplay\vite\Manifest;
 
-use function mindplay\testies\{ eq, run, test };
+use function mindplay\testies\{ configure, eq, run, test };
 
 require __DIR__ . '/../vendor/autoload.php';
+
+configure()->enableCodeCoverage(__DIR__ . '/coverage.xml', dirname(__DIR__) . '/src');
 
 test(
     "can create tags in dev mode",

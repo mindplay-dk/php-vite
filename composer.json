@@ -4,7 +4,7 @@
     "license": "MS-RL",
     "description": "a lightweight PHP-backend integration for the Vite frontend build tool",
     "scripts": {
-        "test": "php test/test.php"
+        "test": "XDEBUG_MODE=coverage php test/test.php"
     },
     "autoload": {
         "psr-4": {
@@ -15,6 +15,7 @@
         "php": ">=8.1"
     },
     "require-dev": {
-        "mindplay/testies": "^1.1"
+        "mindplay/testies": "^1.1",
+        "phpunit/php-code-coverage": "^10"
     }
 }
