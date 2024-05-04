@@ -45,6 +45,14 @@ $tags = $vite->createTags("index.ts");
 
 Your entry point scripts are defined in Vite's [`build.rollupOptions`](https://vitejs.dev/config/build-options#build-rollupoptions) using RollUp's [`input`](https://rollupjs.org/configuration-options/#input) setting.
 
+Note that, if you have **multiple entry point scripts** on **the same page**, you should pass them in a *single* call - for example:
+
+```php
+$tags = $vite->createTags("index.ts", "consent-banner.ts");
+```
+
+Making multiple calls for different entry points *may* result in duplicate tags for any shared static imports - you will most likely need just *one* instance of `Tags` on a single page.
+
 #### 3. Emit from `Tags` in your HTML template:
 
 Your `Tags` instance contains the `preload` and `css` tags, which should be emitted in
