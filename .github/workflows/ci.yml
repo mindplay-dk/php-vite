@@ -18,7 +18,7 @@ jobs:
       - uses: shivammathur/setup-php@2.30.4
         with:
           php-version: ${{ matrix.php }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2 # faster checkout
       - run: composer install --no-progress --no-ansi --no-interaction --dev --prefer-dist
