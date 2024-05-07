@@ -17,6 +17,15 @@
             "_shared.83069a53.js"
         ]
     },
+    "consent-banner.js": {
+        "file": "assets/consent-banner.0e3b3b7b.js",
+        "src": "consent-banner.js",
+        "name": "consent-banner",
+        "isEntry": true,
+        "css": [
+            "assets/consent-banner.8ba40300.css"
+        ]
+    },
     "views/foo.js": {
         "file": "assets/foo.869aea0d.js",
         "src": "views/foo.js",

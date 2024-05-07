@@ -121,7 +121,9 @@ class Manifest
     }
 
     /**
-     * Create preload, CSS and JS tags for the specified entries.
+     * Create preload, CSS and JS tags for the specified entry point script(s).
+     *
+     * Entry points are defined in Vite's `build.rollupOptions` using RollUp's `input` setting.
      *
      * The expected typical usage in an HTML template is as follows:
      *
@@ -139,6 +141,9 @@ class Manifest
      *   </body>
      * </html>
      * ```
+     *
+     * @link https://vitejs.dev/config/build-options#build-rollupoptions
+     * @link https://rollupjs.org/configuration-options/#input
      */
     public function createTags(string ...$entries): Tags
     {
@@ -262,7 +267,7 @@ class Manifest
                 throw new RuntimeException("Entry not found in manifest: {$entry}");
             }
 
-            if (! $chunk->isEntry && ! $chunk->isDynamicEntry) {
+            if (! $chunk->isEntry) {
                 throw new RuntimeException("Chunk is not an entry point: {$entry}");
             }
 

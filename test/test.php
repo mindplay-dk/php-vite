@@ -2,7 +2,7 @@
 
 use mindplay\vite\Manifest;
 
-use function mindplay\testies\{ configure, eq, run, test };
+use function mindplay\testies\{ configure, eq, expect, run, test };
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -99,7 +99,7 @@ test(
 
         $vite->preloadImages();
 
-        $tags = $vite->createTags("main.js", "views/foo.js");
+        $tags = $vite->createTags("main.js", "consent-banner.js");
 
         eq(
             explode("\n", $tags->preload),
@@ -110,7 +110,7 @@ test(
                 // Preload module shared by both entry points, no duplicates:
                 '<link rel="modulepreload" href="/dist/assets/shared.83069a53.js" />',
                 // Preload `views/foo.js` entry point script:
-                '<link rel="modulepreload" href="/dist/assets/foo.869aea0d.js" />',
+                '<link rel="modulepreload" href="/dist/assets/consent-banner.0e3b3b7b.js" />',
             ],
         );
 
@@ -121,6 +121,8 @@ test(
                 '<link rel="stylesheet" href="/dist/assets/main.b82dbe22.css" />',
                 // CSS shared by both entry points, no duplicates:
                 '<link rel="stylesheet" href="/dist/assets/shared.a834bfc3.css" />',
+                // CSS imported by the consent-banner entry point script:
+                '<link rel="stylesheet" href="/dist/assets/consent-banner.8ba40300.css" />',
             ]
         );
 
@@ -129,7 +131,40 @@ test(
             [
                 // Main entry point script:
                 '<script type="module" src="/dist/assets/main.4889e940.js"></script>',
+                // Consent-banner entry point script:
+                '<script type="module" src="/dist/assets/consent-banner.0e3b3b7b.js"></script>',
             ]
+        );
+    }
+);
+
+test(
+    "should throw an exception when an entry is not found, or has the wrong type",
+    function () {
+        $vite = new Manifest(
+            dev: false,
+            manifest_path: __DIR__.'/fixtures/manifest.json',
+            base_path: '/dist/'
+        );
+
+        $vite->preloadImages();
+
+        expect(
+            RuntimeException::class,
+            "`does-not-exist.js` does... not exist :-)",
+            function () use ($vite) {
+                $tags = $vite->createTags("main.js", "does-not-exist.js");
+            },
+            "/Entry not found in manifest\\: does-not-exist\\.js/"
+        );
+
+        expect(
+            RuntimeException::class,
+            "`does-not-exist.js` does... not exist :-)",
+            function () use ($vite) {
+                $tags = $vite->createTags("views/foo.js");
+            },
+            "/Chunk is not an entry point\\: views\\/foo\\.js/"
         );
     }
 );
