@@ -129,11 +129,6 @@ test(
             [
                 // Main entry point script:
                 '<script type="module" src="/dist/assets/main.4889e940.js"></script>',
-                // TODO open an issue to verify Vite's documentation:
-                //      https://vitejs.dev/guide/backend-integration
-                //      In their example, a `<script>` tag is generated for the `views/foo.js` script,
-                //      but this seems wrong, as the script is already preloaded as a module - in their example,
-                //      `views/foo.js` is a dynamic entry point, and should be loaded dynamically, not eagerly. (?)
             ]
         );
     }
