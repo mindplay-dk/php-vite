@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/license-MS--RL-green)](https://opensource.org/license/ms-rl-html)
 
 This library provides a lightweight [backend integration](https://vitejs.dev/guide/backend-integration.html)
-for your PHP-based MPA, SPA or PWA based on [Vite](https://vitejs.dev/).
+for your PHP-based MPA, SPA, or PWA based on [Vite](https://vitejs.dev/).
 
 It parses the [build manifest](https://vitejs.dev/config/build-options#build-manifest) (the `.vite/manifest.json` file)
 and produces the required `<script>` and `<link>` tags to load (and preload) scripts, CSS files, and other assets.
@@ -13,7 +13,7 @@ and produces the required `<script>` and `<link>` tags to load (and preload) scr
 ## Basic Usage
 
 A commented MPA example is available [here](https://github.com/mindplay-dk/php-vite-mpa) -
-please refer to this for examples of configuring Vite, NPM, TypeScript and Composer.
+please refer to this for examples of configuring Vite, NPM, TypeScript, and Composer.
 
 In the following steps, we'll cover usage of the library API only.
 
@@ -27,13 +27,13 @@ $vite = new Manifest(
 );
 ```
 
-Teh `manifest_path` points to the Vite `manifest.json` file created for the production build.
+The `manifest_path` points to the Vite `manifest.json` file created for the production build.
 
 In this example, `dev` is `false`, so we'll be creating tags for the production assets.
 
 The `base_path` is relative to your public web root - it is the root folder from which Vite's production assets are served, and/or the root folder from which Vite serves assets dynamically in development mode.
 
-Note that, in development mode (when `dev` set to `false`) the `manifest.json` file is unused, and not required.
+Note that, in development mode (when `dev` is set to `true`) the `manifest.json` file is unused, and not required.
 
 > 💡 *For a detailed description of the constructor arguments, please refer to the `Manifest` constructor argument doc-blocks.*
 
@@ -55,7 +55,7 @@ Making multiple calls for different entry points *may* result in duplicate tags 
 
 #### 3. Emit from `Tags` in your HTML template:
 
-Your `Tags` instance contains the `preload` and `css` tags, which should be emitted in
+Your `Tags` instance contains the `preload` and `CSS` tags, which should be emitted in
 your `<head>` tag, as well as the `js` tags, which should be emitted immediately before
 the `</body>` end tag.
 
@@ -105,7 +105,7 @@ Then create your tags as covered in the documentation above.
 
 ## Creating URLs
 
-For advanced use-cases, you can also directly get the URL for an asset published by Vite:
+For advanced use cases, you can also directly get the URL for an asset published by Vite:
 
 ```php
 $my_url = $manifest->getURL("consent-banner.ts");
@@ -113,5 +113,5 @@ $my_url = $manifest->getURL("consent-banner.ts");
 
 You can use this feature to, for example:
 
-* Create your own custom preload tags (e.g. with media-queries)
+* Create your own custom preload tags (e.g. with media queries)
 * Conditionally load a script based on user interactions or user state, etc.
