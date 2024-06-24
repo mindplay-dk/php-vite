@@ -55,7 +55,7 @@ Making multiple calls for different entry points *may* result in duplicate tags 
 
 #### 3. Emit from `Tags` in your HTML template:
 
-Your `Tags` instance contains the `preload` and `CSS` tags, which should be emitted in
+Your `Tags` instance contains the preload and CSS tags, which should be emitted in
 your `<head>` tag, as well as the `js` tags, which should be emitted immediately before
 the `</body>` end tag.
 
