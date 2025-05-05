@@ -20,6 +20,8 @@ In the following steps, we'll cover usage of the library API only.
 #### 1. Load the `manifest.json` file created by Vite:
 
 ```php
+use mindplay\vite\Manifest;
+
 $vite = new Manifest(
     manifest_path: $your_root_dir . '/public/dist/.vite/manifest.json',
     base_path: '/dist/',
