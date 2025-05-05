@@ -1,4 +1,4 @@
-# PHP-Vite
+# `mindplay\php-vite`
 
 [![PHP Version](https://img.shields.io/badge/php-8.1%2B-blue.svg)](https://packagist.org/packages/mindplay/php-vite)
 [![Build Status](https://github.com/mindplay-dk/php-vite/actions/workflows/ci.yml/badge.svg)](https://github.com/mindplay-dk/php-vite/actions/workflows/ci.yml)
