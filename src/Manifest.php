@@ -11,6 +11,15 @@ use RuntimeException;
 class Manifest
 {
     /**
+     * Preloaded `as` types that require a nonce attribute for CSP compliance.
+     * e.g. `<link rel="preload" as="style" nonce="...">`
+     */
+    private const CSP_LINK_TYPES = [
+        'script',
+        'style',
+    ];
+
+    /**
      * @var array<string,Chunk> map where chunk names => `Chunk` instances.
      */
     private array $chunks;
@@ -248,7 +257,7 @@ class Manifest
                 $type = $preload['type'];
                 $as = $preload['as'];
 
-                $instanceNonceAttr = in_array($as, ['script', 'style']) ? $this->nonceAttr : '';
+                $instanceNonceAttr = in_array($as, self::CSP_LINK_TYPES) ? $this->nonceAttr : '';
 
                 $tags[] = "<link rel=\"preload\" as=\"{$as}\" type=\"{$type}\" href=\"{$this->base_path}{$chunk->file}\"{$instanceNonceAttr} />";
             }
@@ -261,7 +270,7 @@ class Manifest
                     $type = $preload['type'];
                     $as = $preload['as'];
 
-                    $instanceNonceAttr = in_array($as, ['script', 'style']) ? $this->nonceAttr : '';
+                    $instanceNonceAttr = in_array($as, self::CSP_LINK_TYPES) ? $this->nonceAttr : '';
 
                     $tags[] = "<link rel=\"preload\" as=\"{$as}\" type=\"{$type}\" href=\"{$this->base_path}{$asset}\"{$instanceNonceAttr} />";
                 }
