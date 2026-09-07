@@ -25,7 +25,8 @@ use mindplay\vite\Manifest;
 $vite = new Manifest(
     manifest_path: $your_root_dir . '/public/dist/.vite/manifest.json',
     base_path: '/dist/',
-    dev: false
+    dev: false,
+    nonce: '...',
 );
 ```
 
@@ -36,6 +37,8 @@ In this example, `dev` is `false`, so we'll be creating tags for the production 
 The `base_path` is relative to your public web root - it is the root folder from which Vite's production assets are served, and/or the root folder from which Vite serves assets dynamically in development mode.
 
 Note that, in development mode (when `dev` is set to `true`) the `manifest.json` file is unused, and not required.
+
+The `nonce` parameter is optional; you should only set it for projects that use a Content Security Policy (CSP) with a nonce attribute. If provided, will be automatically added to all script, style, and applicable link tags for CSP compliance.
 
 > 💡 *For a detailed description of the constructor arguments, please refer to the `Manifest` constructor argument doc-blocks.*
 

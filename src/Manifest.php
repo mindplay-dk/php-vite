@@ -63,7 +63,7 @@ class Manifest
         private string $base_path,
 
         /**
-         * When provided, a `nonce` attribute will be added to each script, style, and link tag.
+         * When provided, a `nonce` attribute will be added to each script, style, and applicable link tag.
          * Used for projects that have a CSP (Content Security Policy).
          */
         string $nonce = '',
