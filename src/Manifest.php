@@ -2,6 +2,7 @@
 
 namespace mindplay\vite;
 
+use InvalidArgumentException;
 use RuntimeException;
 
 /**
@@ -18,6 +19,11 @@ class Manifest
      * @var array<string,array{type:string,as:string}> map where file extensions => preloaded MIME and content types.
      */
     private array $preload_types = [];
+
+    /**
+     * @var string Nonce attribute value for inline scripts, styles, and links.
+     */
+    private string $nonceAttr = '';
 
     public function __construct(
         /**
@@ -46,6 +52,12 @@ class Manifest
          * to a CDN or other asset server, if you are serving assets from a different domain.
          */
         private string $base_path,
+
+        /**
+         * When provided, a `nonce` attribute will be added to each script, style, and link tag.
+         * Used for projects that have a CSP (Content Security Policy).
+         */
+        string $nonce = '',
     ) {
         if ($this->dev) {
             // In development mode, we don't need the `manifest.json` file:
@@ -66,6 +78,16 @@ class Manifest
                 fn(array $chunk) => Chunk::create($chunk),
                 json_decode(file_get_contents($this->manifest_path), true)
             );
+        }
+
+        $nonce = trim($nonce);
+
+        if ($nonce !== '') {
+            if (!preg_match('~^[A-Za-z0-9+/_-]+={0,2}$~', $nonce)) {
+                throw new InvalidArgumentException('Nonce must be a valid CSP base64 or base64url token.');
+            }
+
+            $this->nonceAttr = ' nonce="' . htmlspecialchars($nonce, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"';
         }
     }
 
@@ -161,10 +183,10 @@ class Manifest
         if ($this->dev) {
             // In development mode, Vite will dynamically inject CSS and JS tags:
 
-            $js = ["<script type=\"module\" src=\"{$this->base_path}@vite/client\"></script>"];
+            $js = ["<script type=\"module\" src=\"{$this->base_path}@vite/client\"{$this->nonceAttr}></script>"];
 
             foreach ($entries as $entry) {
-                $js[] = "<script type=\"module\" src=\"{$this->base_path}{$entry}\"></script>";
+                $js[] = "<script type=\"module\" src=\"{$this->base_path}{$entry}\"{$this->nonceAttr}></script>";
             }
 
             return new Tags(js: implode("\n", $js));
@@ -214,7 +236,7 @@ class Manifest
             // Preload module:
 
             if (str_ends_with($chunk->file, '.js')) {
-                $tags[] = "<link rel=\"modulepreload\" href=\"{$this->base_path}{$chunk->file}\" />";
+                $tags[] = "<link rel=\"modulepreload\" href=\"{$this->base_path}{$chunk->file}\"{$this->nonceAttr} />";
             }
 
             // Preload assets:
@@ -226,7 +248,9 @@ class Manifest
                 $type = $preload['type'];
                 $as = $preload['as'];
 
-                $tags[] = "<link rel=\"preload\" as=\"{$as}\" type=\"{$type}\" href=\"{$this->base_path}{$chunk->file}\" />";
+                $instanceNonceAttr = in_array($as, ['script', 'style']) ? $this->nonceAttr : '';
+
+                $tags[] = "<link rel=\"preload\" as=\"{$as}\" type=\"{$type}\" href=\"{$this->base_path}{$chunk->file}\"{$instanceNonceAttr} />";
             }
 
             foreach ($chunk->assets as $asset) {
@@ -237,7 +261,9 @@ class Manifest
                     $type = $preload['type'];
                     $as = $preload['as'];
 
-                    $tags[] = "<link rel=\"preload\" as=\"{$as}\" type=\"{$type}\" href=\"{$this->base_path}{$asset}\" />";
+                    $instanceNonceAttr = in_array($as, ['script', 'style']) ? $this->nonceAttr : '';
+
+                    $tags[] = "<link rel=\"preload\" as=\"{$as}\" type=\"{$type}\" href=\"{$this->base_path}{$asset}\"{$instanceNonceAttr} />";
                 }
             }
         }
@@ -254,11 +280,11 @@ class Manifest
 
         foreach ($chunks as $chunk) {
             foreach ($chunk->css as $css) {
-                $tags[] = "<link rel=\"stylesheet\" href=\"{$this->base_path}{$css}\" />";
+                $tags[] = "<link rel=\"stylesheet\" href=\"{$this->base_path}{$css}\"{$this->nonceAttr} />";
             }
 
             if (str_ends_with($chunk->file, '.css') && $chunk->isEntry) {
-                $tags[] = "<link rel=\"stylesheet\" href=\"{$this->base_path}{$chunk->file}\" />";
+                $tags[] = "<link rel=\"stylesheet\" href=\"{$this->base_path}{$chunk->file}\"{$this->nonceAttr} />";
             }
         }
 
@@ -274,7 +300,7 @@ class Manifest
 
         foreach ($chunks as $chunk) {
             if (str_ends_with($chunk->file, '.js') && $chunk->isEntry) {
-                $tags[] = "<script type=\"module\" src=\"{$this->base_path}{$chunk->file}\"></script>";
+                $tags[] = "<script type=\"module\" src=\"{$this->base_path}{$chunk->file}\"{$this->nonceAttr}></script>";
             }
         }
 

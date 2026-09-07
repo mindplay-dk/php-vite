@@ -204,4 +204,102 @@ test(
     }
 );
 
+test(
+    "can add a nonce to development tags",
+    function () {
+        $vite = new Manifest(
+            dev: true,
+            manifest_path: __DIR__.'/fixtures/manifest.json',
+            base_path: '/dist/',
+            nonce: '8IBTHwOdqNKAWeKl7plt8g=='
+        );
+
+        eq(
+            $vite->createTags("main.js")->js,
+            implode("\n", [
+                '<script type="module" src="/dist/@vite/client" nonce="8IBTHwOdqNKAWeKl7plt8g=="></script>',
+                '<script type="module" src="/dist/main.js" nonce="8IBTHwOdqNKAWeKl7plt8g=="></script>',
+            ])
+        );
+    }
+);
+
+test(
+    "can add a nonce to applicable production tags",
+    function () {
+        $vite = new Manifest(
+            dev: false,
+            manifest_path: __DIR__.'/fixtures/manifest.json',
+            base_path: '/dist/',
+            nonce: '8IBTHwOdqNKAWeKl7plt8g=='
+        );
+
+        $vite->preloadImages();
+        $tags = $vite->createTags("main.js");
+
+        eq(
+            explode("\n", $tags->preload),
+            [
+                '<link rel="modulepreload" href="/dist/assets/main.4889e940.js" nonce="8IBTHwOdqNKAWeKl7plt8g==" />',
+                '<link rel="preload" as="image" type="image/png" href="/dist/assets/asset.0ab0f9cd.png" />',
+                '<link rel="modulepreload" href="/dist/assets/shared.83069a53.js" nonce="8IBTHwOdqNKAWeKl7plt8g==" />',
+            ]
+        );
+
+        eq(
+            explode("\n", $tags->css),
+            [
+                '<link rel="stylesheet" href="/dist/assets/main.b82dbe22.css" nonce="8IBTHwOdqNKAWeKl7plt8g==" />',
+                '<link rel="stylesheet" href="/dist/assets/shared.a834bfc3.css" nonce="8IBTHwOdqNKAWeKl7plt8g==" />',
+            ]
+        );
+
+        eq(
+            $tags->js,
+            '<script type="module" src="/dist/assets/main.4889e940.js" nonce="8IBTHwOdqNKAWeKl7plt8g=="></script>'
+        );
+    }
+);
+
+test(
+    "rejects invalid nonces",
+    function () {
+        foreach (['has whitespace', 'contains"quote', '<script>', "contains\nnewline"] as $nonce) {
+            expect(
+                InvalidArgumentException::class,
+                "invalid nonce is rejected",
+                function () use ($nonce) {
+                    new Manifest(
+                        dev: true,
+                        manifest_path: __DIR__.'/fixtures/manifest.json',
+                        base_path: '/dist/',
+                        nonce: $nonce
+                    );
+                },
+                "/Nonce must be a valid CSP base64 or base64url token\\./"
+            );
+        }
+    }
+);
+
+test(
+    "treats a whitespace-only nonce as omitted",
+    function () {
+        $vite = new Manifest(
+            dev: true,
+            manifest_path: __DIR__.'/fixtures/manifest.json',
+            base_path: '/dist/',
+            nonce: '   '
+        );
+
+        eq(
+            $vite->createTags("main.js")->js,
+            implode("\n", [
+                '<script type="module" src="/dist/@vite/client"></script>',
+                '<script type="module" src="/dist/main.js"></script>',
+            ])
+        );
+    }
+);
+
 exit(run());
