@@ -64,7 +64,7 @@ class Manifest
 
         /**
          * When provided, a `nonce` attribute will be added to each script, style, and applicable link tag.
-         * Used for projects that have a CSP (Content Security Policy).
+         * Used for projects that have a CSP (Content Security Policy) with a `nonce-*` source expression.
          */
         string $nonce = '',
     ) {

@@ -38,7 +38,7 @@ The `base_path` is relative to your public web root - it is the root folder from
 
 Note that, in development mode (when `dev` is set to `true`) the `manifest.json` file is unused, and not required.
 
-The `nonce` parameter is optional; you should only set it for projects that use a Content Security Policy (CSP) with a nonce attribute. If provided, will be automatically added to all script, style, and applicable link tags for CSP compliance.
+The `nonce` parameter is optional; you should only set it for projects that use a Content Security Policy (CSP) with a `nonce-*` source expression. If provided, the `nonce="{value}"` attribute will be automatically added to all script, style, and applicable link tags for CSP compliance.
 
 > 💡 *For a detailed description of the constructor arguments, please refer to the `Manifest` constructor argument doc-blocks.*
 
