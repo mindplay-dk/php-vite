@@ -204,4 +204,91 @@ test(
     }
 );
 
+test(
+    "can create an import map tag in production mode",
+    function () {
+        $vite = new Manifest(
+            dev: false,
+            manifest_path: __DIR__.'/fixtures/manifest.json',
+            base_path: '/dist/',
+            import_map_path: __DIR__.'/fixtures/importmap.json'
+        );
+
+        $tags = $vite->createTags("main.js");
+
+        eq(
+            $tags->importmap,
+            '<script type="importmap">{"imports":{"/dist/assets/shared.stable01.js":"/dist/assets/shared.83069a53.js","/dist/assets/foo.stable02.js":"/dist/assets/foo.869aea0d.js"}}</script>',
+            "production mode: emits the import map inline"
+        );
+
+        eq(
+            explode("\n", $tags->js),
+            [
+                '<script type="module" src="/dist/assets/main.4889e940.js"></script>',
+            ],
+            "production mode: other tags are unaffected by the import map"
+        );
+    }
+);
+
+test(
+    "creates no import map tag unless configured, or in dev mode",
+    function () {
+        $vite = new Manifest(
+            dev: false,
+            manifest_path: __DIR__.'/fixtures/manifest.json',
+            base_path: '/dist/'
+        );
+
+        eq($vite->createTags("main.js")->importmap, "", "production mode: no import map configured");
+
+        $vite = new Manifest(
+            dev: true,
+            manifest_path: __DIR__.'/fixtures/manifest.json',
+            base_path: '/dist/',
+            import_map_path: __DIR__.'/fixtures/does-not-exist.json'
+        );
+
+        eq($vite->createTags("main.js")->importmap, "", "dev mode: Vite's dev server needs no import map");
+    }
+);
+
+test(
+    "escapes `<` so the import map can't close its script tag",
+    function () {
+        $vite = new Manifest(
+            dev: false,
+            manifest_path: __DIR__.'/fixtures/manifest.json',
+            base_path: '/dist/',
+            import_map_path: __DIR__.'/fixtures/importmap-markup.json'
+        );
+
+        eq(
+            $vite->createTags("main.js")->importmap,
+            '<script type="importmap">{"imports":{"/dist/a.js":"/dist/\u003C/script>.js"}}</script>',
+            "production mode: `<` is unicode-escaped"
+        );
+    }
+);
+
+test(
+    "should throw an exception when the import map is not found",
+    function () {
+        expect(
+            RuntimeException::class,
+            "a configured import map must exist",
+            function () {
+                new Manifest(
+                    dev: false,
+                    manifest_path: __DIR__.'/fixtures/manifest.json',
+                    base_path: '/dist/',
+                    import_map_path: __DIR__.'/fixtures/does-not-exist.json'
+                );
+            },
+            "/Import map file not found\\: .*does-not-exist\\.json/"
+        );
+    }
+);
+
 exit(run());

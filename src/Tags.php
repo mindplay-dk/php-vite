@@ -10,7 +10,8 @@ class Tags
     public function __construct(
         public readonly string $preload = '',
         public readonly string $css = '',
-        public readonly string $js = ''
+        public readonly string $js = '',
+        public readonly string $importmap = ''
     ) {
     }
 }

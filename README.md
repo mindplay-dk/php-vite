@@ -105,6 +105,41 @@ $manifest->preload(
 
 Then create your tags as covered in the documentation above.
 
+## Import Maps
+
+By default, chunks import each other by their hashed file names - so when one chunk
+changes, every chunk that imports it (directly or indirectly) gets a new hash as well,
+and browsers have to download all of them again.
+
+Vite's [`build.chunkImportMap`](https://vite.dev/config/build-options#build-chunkimportmap) option
+(experimental) avoids this: chunks import each other through stable specifiers, and an import map
+resolves those to the hashed file names. Vite writes it to `importmap.json` in the output directory -
+point the service at that file:
+
+```php
+$vite = new Manifest(
+    dev: false,
+    manifest_path: $root_path . '/public/dist/.vite/manifest.json',
+    base_path: '/dist/',
+    import_map_path: $root_path . '/public/dist/importmap.json',
+);
+```
+
+Then emit `$tags->importmap` in your `<head>`, **before** the preload tags - browsers ignore
+an import map that arrives after the first module has started loading, and only one import
+map per page is supported everywhere:
+
+```html
+<head>
+    <?= $tags->importmap ?>
+    <?= $tags->preload ?>
+    <?= $tags->css ?>
+</head>
+```
+
+The import map is emitted inline, as browsers don't consistently support external import maps.
+In development mode, `$tags->importmap` is empty.
+
 ## Creating URLs
 
 For advanced use cases, you can also directly get the URL for an asset published by Vite:

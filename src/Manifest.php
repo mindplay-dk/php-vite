@@ -46,6 +46,17 @@ class Manifest
          * to a CDN or other asset server, if you are serving assets from a different domain.
          */
         private string $base_path,
+
+        /**
+         * Absolute path to the import map file created by Vite's `build.chunkImportMap` option.
+         *
+         * With this option enabled, chunks import each other through stable specifiers, and
+         * only the import map knows the hashed file names - so a changed chunk no longer
+         * renames every chunk that imports it.
+         *
+         * This is optional, and only used in production mode.
+         */
+        private ?string $import_map_path = null,
     ) {
         if ($this->dev) {
             // In development mode, we don't need the `manifest.json` file:
@@ -66,6 +77,14 @@ class Manifest
                 fn(array $chunk) => Chunk::create($chunk),
                 json_decode(file_get_contents($this->manifest_path), true)
             );
+
+            if ($this->import_map_path !== null && !is_readable($this->import_map_path)) {
+                throw new RuntimeException(
+                    file_exists($this->import_map_path)
+                    ? "Import map file is not readable: {$this->import_map_path}"
+                    : "Import map file not found: {$this->import_map_path}"
+                );
+            }
         }
     }
 
@@ -176,7 +195,8 @@ class Manifest
             return new Tags(
                 preload: $this->createPreloadTags($chunks),
                 css: $this->createStyleTags($chunks),
-                js: $this->createScriptTags($chunks)
+                js: $this->createScriptTags($chunks),
+                importmap: $this->createImportMapTag()
             );
         }
     }
@@ -279,6 +299,21 @@ class Manifest
         }
 
         return implode("\n", $tags);
+    }
+
+    private function createImportMapTag(): string
+    {
+        if ($this->import_map_path === null) {
+            return '';
+        }
+
+        $json = trim(file_get_contents($this->import_map_path));
+
+        // `<` can only occur inside JSON strings, so its unicode escape keeps `</script>` out:
+
+        $json = str_replace('<', '\u003C', $json);
+
+        return "<script type=\"importmap\">{$json}</script>";
     }
 
     private function findImportedChunks(array $entries): array
